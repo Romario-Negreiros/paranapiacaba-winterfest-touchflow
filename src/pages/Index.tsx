@@ -1,12 +1,25 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { BookingForm } from "@/components/BookingForm";
 
 const Index = () => {
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'booking'>('welcome');
+
+  const handleStartBooking = () => {
+    setCurrentScreen('booking');
+  };
+
+  const handleBackToWelcome = () => {
+    setCurrentScreen('welcome');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="font-sans">
+      {currentScreen === 'welcome' ? (
+        <WelcomeScreen onStart={handleStartBooking} />
+      ) : (
+        <BookingForm onBack={handleBackToWelcome} />
+      )}
     </div>
   );
 };

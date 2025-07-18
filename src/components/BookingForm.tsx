@@ -1,0 +1,220 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Calendar } from "@/components/ui/calendar";
+import { VirtualKeyboard } from "./VirtualKeyboard";
+import { ArrowLeft, User, Mail, Phone, CreditCard, Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+
+interface BookingFormProps {
+  onBack: () => void;
+}
+
+export function BookingForm({ onBack }: BookingFormProps) {
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [activeField, setActiveField] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    cpf: "",
+    name: "",
+    email: "",
+    phone: ""
+  });
+
+  const formatCPF = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  };
+
+  const formatPhone = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  };
+
+  const handleFieldChange = (field: string, value: string) => {
+    let formattedValue = value;
+    
+    if (field === 'cpf') {
+      formattedValue = formatCPF(value);
+    } else if (field === 'phone') {
+      formattedValue = formatPhone(value);
+    }
+    
+    setFormData(prev => ({ ...prev, [field]: formattedValue }));
+  };
+
+  const handleSubmit = () => {
+    if (!selectedDate || !formData.cpf || !formData.name || !formData.email || !formData.phone) {
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+    
+    // Here we would save to Supabase
+    alert("Agendamento realizado com sucesso! Você receberá uma confirmação por email.");
+    
+    // Reset form
+    setSelectedDate(undefined);
+    setFormData({ cpf: "", name: "", email: "", phone: "" });
+    onBack();
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-ice p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Button 
+            variant="kiosk-outline" 
+            size="kiosk"
+            onClick={onBack}
+          >
+            <ArrowLeft className="w-6 h-6" />
+            Voltar
+          </Button>
+          
+          <h1 className="text-3xl md:text-4xl font-bold text-primary">
+            Agendamento de Visita
+          </h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Calendar Section */}
+          <Card className="shadow-card animate-fade-in">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <CalendarIcon className="w-6 h-6" />
+                Escolha a Data
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                className="w-full rounded-kiosk border-2 border-primary/20 pointer-events-auto p-3"
+                disabled={(date) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return date < today;
+                }}
+              />
+              
+              {selectedDate && (
+                <div className="mt-4 p-4 bg-primary/10 rounded-lg">
+                  <p className="text-lg font-medium text-primary">
+                    Data selecionada: {format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Form Section */}
+          <Card className="shadow-card animate-fade-in">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-2xl">
+                <User className="w-6 h-6" />
+                Seus Dados
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* CPF */}
+              <div>
+                <Label htmlFor="cpf" className="text-lg font-medium flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  CPF *
+                </Label>
+                <Input
+                  id="cpf"
+                  value={formData.cpf}
+                  placeholder="000.000.000-00"
+                  className="text-lg h-14 rounded-lg mt-2"
+                  onFocus={() => setActiveField('cpf')}
+                  onChange={(e) => handleFieldChange('cpf', e.target.value)}
+                  maxLength={14}
+                />
+              </div>
+
+              {/* Nome */}
+              <div>
+                <Label htmlFor="name" className="text-lg font-medium flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  Nome Completo *
+                </Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  placeholder="Seu nome completo"
+                  className="text-lg h-14 rounded-lg mt-2"
+                  onFocus={() => setActiveField('name')}
+                  onChange={(e) => handleFieldChange('name', e.target.value)}
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <Label htmlFor="email" className="text-lg font-medium flex items-center gap-2">
+                  <Mail className="w-5 h-5" />
+                  E-mail *
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={formData.email}
+                  placeholder="seu@email.com"
+                  className="text-lg h-14 rounded-lg mt-2"
+                  onFocus={() => setActiveField('email')}
+                  onChange={(e) => handleFieldChange('email', e.target.value)}
+                />
+              </div>
+
+              {/* Telefone */}
+              <div>
+                <Label htmlFor="phone" className="text-lg font-medium flex items-center gap-2">
+                  <Phone className="w-5 h-5" />
+                  Celular *
+                </Label>
+                <Input
+                  id="phone"
+                  value={formData.phone}
+                  placeholder="(11) 99999-9999"
+                  className="text-lg h-14 rounded-lg mt-2"
+                  onFocus={() => setActiveField('phone')}
+                  onChange={(e) => handleFieldChange('phone', e.target.value)}
+                  maxLength={15}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button 
+                variant="kiosk" 
+                size="kiosk"
+                onClick={handleSubmit}
+                className="w-full mt-8"
+              >
+                Confirmar Agendamento
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Virtual Keyboard */}
+        {activeField && (
+          <div className="fixed bottom-0 left-0 right-0 z-50 animate-fade-in">
+            <VirtualKeyboard
+              activeField={activeField}
+              onInput={(value) => handleFieldChange(activeField, formData[activeField as keyof typeof formData] + value)}
+              onBackspace={() => {
+                const currentValue = formData[activeField as keyof typeof formData];
+                handleFieldChange(activeField, currentValue.slice(0, -1));
+              }}
+              onClose={() => setActiveField(null)}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
