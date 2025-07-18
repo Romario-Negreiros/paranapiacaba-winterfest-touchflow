@@ -21,7 +21,7 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
   
   const specialChars = isEmail 
     ? ['@', '.', '-', '_'] 
-    : ['.', '-', '(', ')', ' '];
+    : ['@', '.', '-', '(', ')', ' '];
 
   return (
     <div className="bg-white border-t-4 border-primary shadow-kiosk p-4">
