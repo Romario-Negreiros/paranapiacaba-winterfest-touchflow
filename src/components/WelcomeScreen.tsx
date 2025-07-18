@@ -80,10 +80,7 @@ export function WelcomeScreen({ onStart }: WelcomeScreenProps) {
           >
             Agendar Minha Visita
           </Button>
-          
-          <p className="mt-6 text-lg text-gray-300">
-            Toque na tela para começar
-          </p>
+
         </div>
       </div>
     </div>
