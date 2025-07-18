@@ -41,6 +41,8 @@ export default function Admin() {
   const [loadingBookings, setLoadingBookings] = useState(false);
   const [pendingAdmins, setPendingAdmins] = useState<PendingAdmin[]>([]);
   const [loadingPendingAdmins, setLoadingPendingAdmins] = useState(false);
+  const [isAuthorizedAdmin, setIsAuthorizedAdmin] = useState(false);
+  const [checkingAuthorization, setCheckingAuthorization] = useState(true);
   
   // Auth form state
   const [email, setEmail] = useState("");
@@ -50,35 +52,97 @@ export default function Admin() {
   
   const { toast } = useToast();
 
+  // Function to check if user is authorized admin
+  const checkAdminAuthorization = async (userEmail: string) => {
+    setCheckingAuthorization(true);
+    
+    // Always allow admin@festival.com
+    if (userEmail === 'admin@festival.com') {
+      setIsAuthorizedAdmin(true);
+      setCheckingAuthorization(false);
+      return true;
+    }
+
+    try {
+      // Check if user is approved in pending_admins
+      const { data, error } = await supabase
+        .from('pending_admins')
+        .select('status')
+        .eq('email', userEmail)
+        .eq('status', 'approved')
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+        console.error('Error checking admin authorization:', error);
+        setIsAuthorizedAdmin(false);
+        setCheckingAuthorization(false);
+        return false;
+      } else if (data) {
+        setIsAuthorizedAdmin(true);
+        setCheckingAuthorization(false);
+        return true;
+      } else {
+        setIsAuthorizedAdmin(false);
+        setCheckingAuthorization(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('Error checking admin authorization:', error);
+      setIsAuthorizedAdmin(false);
+      setCheckingAuthorization(false);
+      return false;
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
         
-        // Load data when user logs in
-        if (session?.user && session.user.email === 'admin@festival.com') {
-          setTimeout(() => {
-            loadBookings();
-            loadPendingAdmins();
-          }, 0);
+        if (session?.user) {
+          const isAuthorized = await checkAdminAuthorization(session.user.email!);
+          
+          // Load data if user is authorized
+          if (isAuthorized || session.user.email === 'admin@festival.com') {
+            setTimeout(() => {
+              loadBookings();
+              // Only load pending admins for main admin
+              if (session.user.email === 'admin@festival.com') {
+                loadPendingAdmins();
+              }
+            }, 0);
+          }
+        } else {
+          setIsAuthorizedAdmin(false);
+          setCheckingAuthorization(false);
         }
       }
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setIsLoading(false);
       
-      if (session?.user && session.user.email === 'admin@festival.com') {
-        setTimeout(() => {
-          loadBookings();
-          loadPendingAdmins();
-        }, 0);
+      if (session?.user) {
+        const isAuthorized = await checkAdminAuthorization(session.user.email!);
+        
+        if (isAuthorized || session.user.email === 'admin@festival.com') {
+          setTimeout(() => {
+            loadBookings();
+            // Only load pending admins for main admin
+            if (session.user.email === 'admin@festival.com') {
+              loadPendingAdmins();
+            }
+          }, 0);
+        }
+      } else {
+        setIsAuthorizedAdmin(false);
+        setCheckingAuthorization(false);
       }
     });
 
@@ -262,10 +326,12 @@ export default function Admin() {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || checkingAuthorization) {
     return (
       <div className="min-h-screen bg-gradient-ice flex items-center justify-center">
-        <div className="text-2xl text-primary">Carregando...</div>
+        <div className="text-2xl text-primary">
+          {isLoading ? "Carregando..." : "Verificando permissões..."}
+        </div>
       </div>
     );
   }
@@ -354,7 +420,7 @@ export default function Admin() {
   }
 
   // Check if user is authorized admin
-  if (user.email !== 'admin@festival.com') {
+  if (user && !isAuthorizedAdmin) {
     return (
       <div className="min-h-screen bg-gradient-ice flex items-center justify-center p-4">
         <Card className="w-full max-w-md shadow-card">
@@ -363,7 +429,10 @@ export default function Admin() {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              Apenas o administrador principal tem acesso a esta área.
+              Sua solicitação de acesso ainda não foi aprovada pelo administrador principal.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Aguarde a aprovação ou entre em contato com o administrador.
             </p>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="w-4 h-4 mr-2" />
@@ -447,8 +516,8 @@ export default function Admin() {
           </Card>
         </div>
 
-        {/* Pending Admins Section */}
-        {pendingAdmins.length > 0 && (
+        {/* Pending Admins Section - Only for main admin */}
+        {user?.email === 'admin@festival.com' && pendingAdmins.length > 0 && (
           <Card className="shadow-card mb-8">
             <CardHeader>
               <div className="flex justify-between items-center">
