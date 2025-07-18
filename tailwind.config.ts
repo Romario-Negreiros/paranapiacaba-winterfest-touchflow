@@ -12,10 +12,22 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: {
+				DEFAULT: "1rem",
+				sm: "1.5rem",
+				lg: "2rem",
+				xl: "2.5rem",
+				"2xl": "3rem",
+			},
 			screens: {
-				'2xl': '1400px'
-			}
+				"sm": "640px",
+				"md": "768px",
+				"lg": "1024px",
+				"xl": "1280px",
+				"2xl": "1400px",
+				"3xl": "1600px",
+				"kiosk": "1920px",
+			},
 		},
 		extend: {
 			colors: {
@@ -78,7 +90,39 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)',
-				kiosk: 'calc(var(--radius) + 4px)'
+				kiosk: 'clamp(8px, 1vw, 16px)'
+			},
+			fontSize: {
+				xs: "var(--text-xs)",
+				sm: "var(--text-sm)",
+				base: "var(--text-base)",
+				lg: "var(--text-lg)",
+				xl: "var(--text-xl)",
+				"2xl": "var(--text-2xl)",
+				"3xl": "var(--text-3xl)",
+				"4xl": "var(--text-4xl)",
+				"5xl": "var(--text-5xl)",
+				"6xl": "var(--text-6xl)",
+			},
+			spacing: {
+				xs: "var(--spacing-xs)",
+				sm: "var(--spacing-sm)",
+				md: "var(--spacing-md)",
+				lg: "var(--spacing-lg)",
+				xl: "var(--spacing-xl)",
+				"2xl": "var(--spacing-2xl)",
+				"3xl": "var(--spacing-3xl)",
+			},
+			maxWidth: {
+				'kiosk': '1920px',
+				'mobile': '428px',
+				'tablet': '768px',
+				'desktop': '1440px',
+			},
+			minHeight: {
+				'touch': '44px',
+				'kiosk': '64px',
+				'screen-safe': 'calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
 			},
 			fontFamily: {
 				sans: ['Inter', 'system-ui', 'sans-serif']

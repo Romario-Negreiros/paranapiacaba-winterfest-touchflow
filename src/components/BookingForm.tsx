@@ -119,30 +119,31 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-ice p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-ice p-2 sm:p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
           <Button 
             variant="kiosk-outline" 
             size="kiosk"
             onClick={onBack}
+            className="flex-shrink-0"
           >
-            <ArrowLeft className="w-6 h-6" />
-            Voltar
+            <ArrowLeft className="w-5 sm:w-6 h-5 sm:h-6" />
+            <span className="hidden sm:inline">Voltar</span>
           </Button>
           
-          <h1 className="text-3xl md:text-4xl font-bold text-primary">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary">
             Agendamento de Visita
           </h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
           {/* Calendar Section */}
           <Card className="shadow-card animate-fade-in">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <CalendarIcon className="w-6 h-6" />
+            <CardHeader className="pb-4 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                <CalendarIcon className="w-5 sm:w-6 h-5 sm:h-6" />
                 Escolha a Data
               </CardTitle>
             </CardHeader>
@@ -151,7 +152,7 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
-                className="w-full rounded-kiosk border-2 border-primary/20 pointer-events-auto p-3"
+                className="w-full rounded-kiosk border-2 border-primary/20 pointer-events-auto p-2 sm:p-3 text-sm sm:text-base"
                 disabled={(date) => {
                   const today = new Date();
                   today.setHours(0, 0, 0, 0);
@@ -160,8 +161,8 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
               />
               
               {selectedDate && (
-                <div className="mt-4 p-4 bg-primary/10 rounded-lg">
-                  <p className="text-lg font-medium text-primary">
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-primary/10 rounded-lg">
+                  <p className="text-base sm:text-lg font-medium text-primary text-center sm:text-left">
                     Data selecionada: {format(selectedDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
                   </p>
                 </div>
@@ -171,24 +172,24 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
 
           {/* Form Section */}
           <Card className="shadow-card animate-fade-in">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <User className="w-6 h-6" />
+            <CardHeader className="pb-4 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
+                <User className="w-5 sm:w-6 h-5 sm:h-6" />
                 Seus Dados
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
               {/* CPF */}
               <div>
-                <Label htmlFor="cpf" className="text-lg font-medium flex items-center gap-2">
-                  <CreditCard className="w-5 h-5" />
+                <Label htmlFor="cpf" className="text-base sm:text-lg font-medium flex items-center gap-2">
+                  <CreditCard className="w-4 sm:w-5 h-4 sm:h-5" />
                   CPF *
                 </Label>
                 <Input
                   id="cpf"
                   value={formData.cpf}
                   placeholder="000.000.000-00"
-                  className="text-lg h-14 rounded-lg mt-2"
+                  className="text-base sm:text-lg h-12 sm:h-14 rounded-lg mt-2 touch-manipulation"
                   onFocus={() => setActiveField('cpf')}
                   onChange={(e) => handleFieldChange('cpf', e.target.value)}
                   maxLength={14}
@@ -197,15 +198,15 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
 
               {/* Nome */}
               <div>
-                <Label htmlFor="name" className="text-lg font-medium flex items-center gap-2">
-                  <User className="w-5 h-5" />
+                <Label htmlFor="name" className="text-base sm:text-lg font-medium flex items-center gap-2">
+                  <User className="w-4 sm:w-5 h-4 sm:h-5" />
                   Nome Completo *
                 </Label>
                 <Input
                   id="name"
                   value={formData.name}
                   placeholder="Seu nome completo"
-                  className="text-lg h-14 rounded-lg mt-2"
+                  className="text-base sm:text-lg h-12 sm:h-14 rounded-lg mt-2 touch-manipulation"
                   onFocus={() => setActiveField('name')}
                   onChange={(e) => handleFieldChange('name', e.target.value)}
                 />
@@ -213,8 +214,8 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
 
               {/* Email */}
               <div>
-                <Label htmlFor="email" className="text-lg font-medium flex items-center gap-2">
-                  <Mail className="w-5 h-5" />
+                <Label htmlFor="email" className="text-base sm:text-lg font-medium flex items-center gap-2">
+                  <Mail className="w-4 sm:w-5 h-4 sm:h-5" />
                   E-mail *
                 </Label>
                 <Input
@@ -222,7 +223,7 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
                   type="email"
                   value={formData.email}
                   placeholder="seu@email.com"
-                  className="text-lg h-14 rounded-lg mt-2"
+                  className="text-base sm:text-lg h-12 sm:h-14 rounded-lg mt-2 touch-manipulation"
                   onFocus={() => setActiveField('email')}
                   onChange={(e) => handleFieldChange('email', e.target.value)}
                 />
@@ -230,15 +231,15 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
 
               {/* Telefone */}
               <div>
-                <Label htmlFor="phone" className="text-lg font-medium flex items-center gap-2">
-                  <Phone className="w-5 h-5" />
+                <Label htmlFor="phone" className="text-base sm:text-lg font-medium flex items-center gap-2">
+                  <Phone className="w-4 sm:w-5 h-4 sm:h-5" />
                   Celular *
                 </Label>
                 <Input
                   id="phone"
                   value={formData.phone}
                   placeholder="(11) 99999-9999"
-                  className="text-lg h-14 rounded-lg mt-2"
+                  className="text-base sm:text-lg h-12 sm:h-14 rounded-lg mt-2 touch-manipulation"
                   onFocus={() => setActiveField('phone')}
                   onChange={(e) => handleFieldChange('phone', e.target.value)}
                   maxLength={15}
@@ -251,7 +252,7 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
                 size="kiosk"
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="w-full mt-8"
+                className="w-full mt-6 sm:mt-8"
               >
                 {isSubmitting ? "Processando..." : "Confirmar Agendamento"}
               </Button>

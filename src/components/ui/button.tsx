@@ -15,16 +15,16 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        kiosk: "bg-gradient-winter text-white hover:bg-gradient-hero shadow-kiosk border-0 active:animate-touch-feedback font-semibold",
-        "kiosk-outline": "border-2 border-primary bg-card text-primary hover:bg-gradient-winter hover:text-white shadow-card active:animate-touch-feedback font-medium"
+        kiosk: "bg-gradient-winter text-white hover:bg-gradient-hero shadow-kiosk border-0 active:animate-touch-feedback font-semibold transition-all duration-200",
+        "kiosk-outline": "border-2 border-primary bg-card text-primary hover:bg-gradient-winter hover:text-white shadow-card active:animate-touch-feedback font-medium transition-all duration-200"
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
-        kiosk: "h-16 px-8 py-4 text-lg rounded-kiosk min-w-[200px]",
-        "kiosk-xl": "h-20 px-12 py-6 text-xl rounded-kiosk min-w-[280px]"
+        kiosk: "h-16 sm:h-20 px-6 sm:px-8 py-3 sm:py-4 text-lg sm:text-xl rounded-kiosk min-w-[120px] sm:min-w-[200px]",
+        "kiosk-xl": "h-20 sm:h-24 px-8 sm:px-12 py-4 sm:py-6 text-xl sm:text-2xl rounded-kiosk min-w-[160px] sm:min-w-[280px]"
       },
     },
     defaultVariants: {

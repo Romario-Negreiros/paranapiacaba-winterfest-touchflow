@@ -28,14 +28,14 @@ const Index = () => {
   return (
     <div className="font-sans relative">
       {/* Admin button */}
-      <div className="fixed top-4 right-4 z-10">
+      <div className="fixed top-2 sm:top-4 right-2 sm:right-4 z-10">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate('/admin')}
-          className="bg-white/80 backdrop-blur-sm hover:bg-white/90"
+          className="bg-white/80 backdrop-blur-sm hover:bg-white/90 min-h-[44px] min-w-[44px] w-10 sm:w-12 h-10 sm:h-12"
         >
-          <Settings className="w-5 h-5" />
+          <Settings className="w-4 sm:w-5 h-4 sm:h-5" />
         </Button>
       </div>
 

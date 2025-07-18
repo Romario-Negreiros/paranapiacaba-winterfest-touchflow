@@ -26,25 +26,25 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
     : ['@', '.', '-', '(', ')', ' '];
 
   return (
-    <div className="bg-white border-t-4 border-primary shadow-kiosk p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="bg-white border-t-4 border-primary shadow-kiosk p-2 sm:p-4">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-primary">Teclado Virtual</h3>
-          <Button variant="ghost" size="icon" onClick={onClose}>
-            <X className="w-6 h-6" />
+        <div className="flex justify-between items-center mb-3 sm:mb-4">
+          <h3 className="text-base sm:text-lg font-semibold text-primary">Teclado Virtual</h3>
+          <Button variant="ghost" size="icon" onClick={onClose} className="min-h-[44px] min-w-[44px]">
+            <X className="w-5 sm:w-6 h-5 sm:h-6" />
           </Button>
         </div>
 
         {/* Numbers Row */}
-        <div className="flex gap-2 mb-3 justify-center">
+        <div className="flex gap-1 sm:gap-2 mb-2 sm:mb-3 justify-center flex-wrap">
           {numbers.map((num) => (
             <Button
               key={num}
               variant="kiosk-outline"
               size="kiosk"
               onClick={() => onInput(num)}
-              className="w-16 h-16 text-xl"
+              className="w-12 sm:w-16 h-12 sm:h-16 text-lg sm:text-xl min-h-[44px] min-w-[44px]"
             >
               {num}
             </Button>
@@ -53,13 +53,13 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
 
         {/* Letters */}
         {letters.map((row, rowIndex) => (
-          <div key={rowIndex} className="flex gap-2 mb-3 justify-center">
+          <div key={rowIndex} className="flex gap-1 sm:gap-2 mb-2 sm:mb-3 justify-center flex-wrap">
             {rowIndex === 2 && (
               <Button
                 variant={isCapsLock ? "kiosk" : "kiosk-outline"}
                 size="kiosk"
                 onClick={() => setIsCapsLock(!isCapsLock)}
-                className="w-20 h-16 text-sm"
+                className="w-16 sm:w-20 h-12 sm:h-16 text-xs sm:text-sm min-h-[44px]"
               >
                 CAPS
               </Button>
@@ -70,7 +70,7 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
                 variant="kiosk-outline"
                 size="kiosk"
                 onClick={() => onInput(isCapsLock ? letter : letter.toLowerCase())}
-                className="w-16 h-16 text-xl"
+                className="w-12 sm:w-16 h-12 sm:h-16 text-lg sm:text-xl min-h-[44px] min-w-[44px]"
               >
                 {isCapsLock ? letter : letter.toLowerCase()}
               </Button>
@@ -79,7 +79,7 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
         ))}
 
         {/* Special Characters and Controls */}
-        <div className="flex gap-2 justify-center items-center">
+        <div className="flex gap-1 sm:gap-2 justify-center items-center flex-wrap">
           {/* Special chars */}
           {specialChars.map((char) => (
             <Button
@@ -87,9 +87,13 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
               variant="kiosk-outline"
               size="kiosk"
               onClick={() => onInput(char)}
-              className="w-16 h-16 text-xl"
+              className="w-12 sm:w-16 h-12 sm:h-16 text-base sm:text-xl min-h-[44px] min-w-[44px]"
             >
-              {char === ' ' ? 'Espaço' : char}
+              {char === ' ' ? (
+                <span className="text-xs sm:text-sm">Espaço</span>
+              ) : (
+                char
+              )}
             </Button>
           ))}
           
@@ -98,9 +102,9 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
             variant="destructive"
             size="kiosk"
             onClick={onBackspace}
-            className="w-20 h-16"
+            className="w-16 sm:w-20 h-12 sm:h-16 min-h-[44px]"
           >
-            <Delete className="w-6 h-6" />
+            <Delete className="w-5 sm:w-6 h-5 sm:h-6" />
           </Button>
         </div>
       </div>
