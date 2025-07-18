@@ -368,7 +368,7 @@ export default function Admin() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@festival.com"
+                  placeholder=""
                   required
                   className="mt-1"
                 />
