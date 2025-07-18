@@ -72,6 +72,7 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
     setIsSubmitting(true);
     
     try {
+      // Try inserting the booking
       const { data, error } = await supabase
         .from('bookings')
         .insert({
@@ -86,12 +87,12 @@ export function BookingForm({ onBack, onSuccess }: BookingFormProps) {
         .single();
 
       if (error) {
+        console.error('Detailed error:', error);
         toast({
           title: "Erro no agendamento",
-          description: "Erro ao salvar o agendamento. Tente novamente.",
+          description: `Erro ao salvar o agendamento: ${error.message}`,
           variant: "destructive",
         });
-        console.error('Error saving booking:', error);
         return;
       }
 
