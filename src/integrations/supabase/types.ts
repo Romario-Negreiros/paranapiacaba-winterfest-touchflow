@@ -48,6 +48,7 @@ export type Database = {
           email: string
           full_name: string
           id: string
+          phone: string | null
           protocol_number: string
           updated_at: string
           visit_date: string
@@ -58,6 +59,7 @@ export type Database = {
           email: string
           full_name: string
           id?: string
+          phone?: string | null
           protocol_number: string
           updated_at?: string
           visit_date: string
@@ -68,6 +70,7 @@ export type Database = {
           email?: string
           full_name?: string
           id?: string
+          phone?: string | null
           protocol_number?: string
           updated_at?: string
           visit_date?: string
