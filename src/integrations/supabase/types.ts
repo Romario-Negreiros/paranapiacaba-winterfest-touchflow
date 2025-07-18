@@ -77,6 +77,36 @@ export type Database = {
         }
         Relationships: []
       }
+      pending_admins: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          email: string
+          full_name: string | null
+          id: string
+          requested_at: string
+          status: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          email: string
+          full_name?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          requested_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

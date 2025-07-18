@@ -22,6 +22,16 @@ interface Booking {
   created_at: string;
 }
 
+interface PendingAdmin {
+  id: string;
+  email: string;
+  full_name: string | null;
+  requested_at: string;
+  status: string;
+  approved_by: string | null;
+  approved_at: string | null;
+}
+
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -29,10 +39,13 @@ export default function Admin() {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loadingBookings, setLoadingBookings] = useState(false);
+  const [pendingAdmins, setPendingAdmins] = useState<PendingAdmin[]>([]);
+  const [loadingPendingAdmins, setLoadingPendingAdmins] = useState(false);
   
   // Auth form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   
   const { toast } = useToast();
@@ -45,10 +58,11 @@ export default function Admin() {
         setUser(session?.user ?? null);
         setIsLoading(false);
         
-        // Load bookings when user logs in
-        if (session?.user) {
+        // Load data when user logs in
+        if (session?.user && session.user.email === 'admin@festival.com') {
           setTimeout(() => {
             loadBookings();
+            loadPendingAdmins();
           }, 0);
         }
       }
@@ -60,9 +74,10 @@ export default function Admin() {
       setUser(session?.user ?? null);
       setIsLoading(false);
       
-      if (session?.user) {
+      if (session?.user && session.user.email === 'admin@festival.com') {
         setTimeout(() => {
           loadBookings();
+          loadPendingAdmins();
         }, 0);
       }
     });
@@ -98,12 +113,91 @@ export default function Admin() {
     }
   };
 
+  const loadPendingAdmins = async () => {
+    setLoadingPendingAdmins(true);
+    try {
+      const { data, error } = await supabase
+        .from('pending_admins')
+        .select('*')
+        .eq('status', 'pending')
+        .order('requested_at', { ascending: false });
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao carregar solicitações pendentes: " + error.message,
+          variant: "destructive",
+        });
+      } else {
+        setPendingAdmins(data || []);
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao carregar solicitações",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPendingAdmins(false);
+    }
+  };
+
+  const handleAdminAction = async (adminId: string, action: 'approved' | 'denied') => {
+    try {
+      const { error } = await supabase
+        .from('pending_admins')
+        .update({
+          status: action,
+          approved_by: user?.email,
+          approved_at: new Date().toISOString()
+        })
+        .eq('id', adminId);
+
+      if (error) {
+        toast({
+          title: "Erro",
+          description: "Erro ao atualizar solicitação: " + error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: action === 'approved' ? "Solicitação Aprovada" : "Solicitação Negada",
+          description: `A solicitação foi ${action === 'approved' ? 'aprovada' : 'negada'} com sucesso.`,
+        });
+        loadPendingAdmins(); // Recarregar a lista
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Erro inesperado ao processar solicitação",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsAuthenticating(true);
 
     try {
       if (isSignUp) {
+        // Primeiro registra a solicitação na tabela pending_admins
+        const { error: pendingError } = await supabase
+          .from('pending_admins')
+          .insert({
+            email,
+            full_name: fullName || null
+          });
+
+        if (pendingError) {
+          toast({
+            title: "Erro na solicitação",
+            description: pendingError.message,
+            variant: "destructive",
+          });
+          return;
+        }
+
         const redirectUrl = `${window.location.origin}/admin`;
         const { error } = await supabase.auth.signUp({
           email,
@@ -121,9 +215,14 @@ export default function Admin() {
           });
         } else {
           toast({
-            title: "Cadastro realizado!",
-            description: "Verifique seu email para confirmar a conta.",
+            title: "Solicitação Enviada!",
+            description: "Sua solicitação de acesso foi enviada para aprovação. Verifique seu email para confirmar a conta.",
           });
+          // Limpar o formulário
+          setEmail("");
+          setPassword("");
+          setFullName("");
+          setIsSignUp(false);
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -182,6 +281,20 @@ export default function Admin() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAuth} className="space-y-4">
+              {isSignUp && (
+                <div>
+                  <Label htmlFor="fullName">Nome Completo</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Seu nome completo"
+                    className="mt-1"
+                  />
+                </div>
+              )}
+              
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -333,6 +446,68 @@ export default function Admin() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Pending Admins Section */}
+        {pendingAdmins.length > 0 && (
+          <Card className="shadow-card mb-8">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-xl text-orange-600">
+                  Solicitações de Acesso Pendentes ({pendingAdmins.length})
+                </CardTitle>
+                <Button variant="outline" onClick={loadPendingAdmins} disabled={loadingPendingAdmins}>
+                  {loadingPendingAdmins ? "Carregando..." : "Atualizar"}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nome</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Solicitado em</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingAdmins.map((admin) => (
+                      <TableRow key={admin.id}>
+                        <TableCell className="font-medium">
+                          {admin.full_name || "Não informado"}
+                        </TableCell>
+                        <TableCell>{admin.email}</TableCell>
+                        <TableCell>
+                          {format(new Date(admin.requested_at), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleAdminAction(admin.id, 'approved')}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Aprovar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleAdminAction(admin.id, 'denied')}
+                            >
+                              Negar
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Bookings Table */}
         <Card className="shadow-card">
