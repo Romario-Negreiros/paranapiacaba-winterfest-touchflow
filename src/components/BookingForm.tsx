@@ -33,6 +33,12 @@ export function BookingForm({ onBack }: BookingFormProps) {
     return numbers.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
   };
 
+  const capitalizeNames = (value: string) => {
+    return value.split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
   const handleFieldChange = (field: string, value: string) => {
     let formattedValue = value;
     
@@ -40,6 +46,8 @@ export function BookingForm({ onBack }: BookingFormProps) {
       formattedValue = formatCPF(value);
     } else if (field === 'phone') {
       formattedValue = formatPhone(value);
+    } else if (field === 'name') {
+      formattedValue = capitalizeNames(value);
     }
     
     setFormData(prev => ({ ...prev, [field]: formattedValue }));

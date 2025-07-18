@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Delete, X } from "lucide-react";
 
@@ -9,6 +10,7 @@ interface VirtualKeyboardProps {
 }
 
 export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: VirtualKeyboardProps) {
+  const [isCapsLock, setIsCapsLock] = useState(false);
   const isEmail = activeField === 'email';
   
   const letters = [
@@ -52,15 +54,25 @@ export function VirtualKeyboard({ activeField, onInput, onBackspace, onClose }: 
         {/* Letters */}
         {letters.map((row, rowIndex) => (
           <div key={rowIndex} className="flex gap-2 mb-3 justify-center">
+            {rowIndex === 2 && (
+              <Button
+                variant={isCapsLock ? "kiosk" : "kiosk-outline"}
+                size="kiosk"
+                onClick={() => setIsCapsLock(!isCapsLock)}
+                className="w-20 h-16 text-sm"
+              >
+                CAPS
+              </Button>
+            )}
             {row.map((letter) => (
               <Button
                 key={letter}
                 variant="kiosk-outline"
                 size="kiosk"
-                onClick={() => onInput(letter.toLowerCase())}
+                onClick={() => onInput(isCapsLock ? letter : letter.toLowerCase())}
                 className="w-16 h-16 text-xl"
               >
-                {letter}
+                {isCapsLock ? letter : letter.toLowerCase()}
               </Button>
             ))}
           </div>
