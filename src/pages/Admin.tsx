@@ -240,6 +240,28 @@ export default function Admin() {
     );
   }
 
+  // Check if user is authorized admin
+  if (user.email !== 'admin@festival.com') {
+    return (
+      <div className="min-h-screen bg-gradient-ice flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-card">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl text-destructive">Acesso Negado</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center space-y-4">
+            <p className="text-muted-foreground">
+              Apenas o administrador principal tem acesso a esta área.
+            </p>
+            <Button variant="outline" onClick={handleLogout}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Fazer Logout
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-ice p-4">
       <div className="max-w-7xl mx-auto">
