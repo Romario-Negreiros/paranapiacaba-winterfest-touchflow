@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { BookingForm } from "@/components/BookingForm";
+import { ConfirmationScreen } from "@/components/ConfirmationScreen";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 
 const Index = () => {
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'booking'>('welcome');
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'booking' | 'confirmation'>('welcome');
+  const [confirmationData, setConfirmationData] = useState<{protocolNumber: string; visitDate: string} | null>(null);
   const navigate = useNavigate();
 
   const handleStartBooking = () => {
@@ -15,6 +17,12 @@ const Index = () => {
 
   const handleBackToWelcome = () => {
     setCurrentScreen('welcome');
+    setConfirmationData(null);
+  };
+
+  const handleBookingSuccess = (protocolNumber: string, visitDate: string) => {
+    setConfirmationData({ protocolNumber, visitDate });
+    setCurrentScreen('confirmation');
   };
 
   return (
@@ -31,10 +39,20 @@ const Index = () => {
         </Button>
       </div>
 
-      {currentScreen === 'welcome' ? (
+      {currentScreen === 'welcome' && (
         <WelcomeScreen onStart={handleStartBooking} />
-      ) : (
-        <BookingForm onBack={handleBackToWelcome} />
+      )}
+      
+      {currentScreen === 'booking' && (
+        <BookingForm onBack={handleBackToWelcome} onSuccess={handleBookingSuccess} />
+      )}
+
+      {currentScreen === 'confirmation' && confirmationData && (
+        <ConfirmationScreen 
+          protocolNumber={confirmationData.protocolNumber}
+          visitDate={confirmationData.visitDate}
+          onBackToHome={handleBackToWelcome}
+        />
       )}
     </div>
   );
